@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CalendarService } from './service/calendar.service';
 import { CommonModule } from '@angular/common';
+import { isWithinInterval } from 'date-fns';
 
 interface Lesson {
   date: Date;
   title: string;
   startDate: Date;
   endDate: Date;
+  startTime: string;
+  endTime: string;
 }
 
 export enum DayViewEnum{
@@ -28,42 +31,56 @@ export class CalendarComponent implements OnInit {
       title: 'Event 1',
       startDate: new Date(),
       endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+      startTime: '10:00',
+      endTime: '12:00',
     },
     {
       date: new Date(),
       title: 'Event 2',
       startDate: new Date(),
       endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+      startTime: '10:00',
+      endTime: '12:00',
     },
     {
       date: new Date(),
       title: 'Event 4',
       startDate: new Date(),
       endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+      startTime: '10:00',
+      endTime: '12:00',
     },
     {
       date: new Date(),
       title: 'Event 5',
       startDate: new Date(),
       endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+      startTime: '10:00',
+      endTime: '12:00',
     },
     {
       date: new Date(),
       title: 'Event 6',
       startDate: new Date(),
       endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+      startTime: '10:00',
+      endTime: '12:00',
     },
     {
       date: new Date(),
       title: 'Event 7',
       startDate: new Date(),
       endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+      startTime: '10:00',
+      endTime: '12:00',
     },
     {
       date: new Date(new Date().setDate(new Date().getDate() + 1)),
       title: 'Event 3',
       startDate: new Date(),
       endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+      startTime: '10:00',
+      endTime: '12:00',
     },
   ];
 
@@ -82,7 +99,6 @@ export class CalendarComponent implements OnInit {
 
   ngOnInit() {
     this.timeDay = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-    this._service.updateCurrentMonth(new Date());
 
     this._service.currentDaysOfMonth$.subscribe((weeks: Date[][]) => {
       this.daysOfWeeksInMonth = weeks;
@@ -131,7 +147,11 @@ export class CalendarComponent implements OnInit {
   }
 
   validateIfShowEvent(event: Lesson, day: Date): boolean {
-    if (day >= event.startDate && day <= event.endDate) {
+    const start = new Date(event.startDate.getFullYear(), event.startDate.getMonth(), event.startDate.getDate());
+    const end = new Date(event.endDate.getFullYear(), event.endDate.getMonth(), event.endDate.getDate());
+    const current = new Date(day.getFullYear(), day.getMonth(), day.getDate());
+
+    if (isWithinInterval(current, { start, end })) {
       if (day.getDay() === event.date.getDay()) return true;
     }
 
@@ -139,7 +159,7 @@ export class CalendarComponent implements OnInit {
   }
 
   validateIfShowEventTime(event: Lesson, day: Date, time: string): boolean {
-    const timeEvent = event.date.getHours() + ':00';
+    const timeEvent = event.startTime;
     return timeEvent === time && this.validateIfShowEvent(event, day);
   }
 
@@ -171,5 +191,9 @@ export class CalendarComponent implements OnInit {
     this._service.updateCurrentDay(
       new Date(this.currentDay.setDate(this.currentDay.getDate() - 1))
     )
+  }
+
+  countOfEventOnMonth(day: Date): number{
+    return this.events.filter(event => event.date.toDateString() === day.toDateString()).length;
   }
 }

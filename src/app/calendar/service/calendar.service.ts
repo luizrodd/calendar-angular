@@ -87,4 +87,9 @@ export class CalendarService {
     this._currentDay.next(date);
   }
 
+  initializeCalendar() {
+    this.updateCurrentMonth(new Date());
+    this.updateCurrentWeek(new Date());
+    this.updateCurrentDay(new Date());
+  }
 }
