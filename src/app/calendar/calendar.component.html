@@ -89,7 +89,7 @@
           }"
         >
           <div *ngIf="day" class="flex flex-col">
-            <span class="text-gray-700 text-sm">
+            <span class="text-gray-700 text-sm mb-2">
               <span
           [ngClass]="{
             'bg-blue-500 text-white rounded-full p-1': isToday(day)
@@ -133,7 +133,7 @@
     <tbody>
       <tr class="table-row align-inherit border-blue-200">
         <td
-          class="border border-gray-200 w-20 h-full text-left align-top"
+          class="border border-gray-200 w-20 h-full text-left align-top "
           [ngClass]="{
             'bg-gray-200': isToday(day),
             'h-full': countOfEventOnMonth(day) > 4,
@@ -142,7 +142,7 @@
           *ngFor="let day of daysOfWeek"
         >
           <div class="flex flex-col h-full">
-            <span class="text-gray-700 text-sm"
+            <span class="text-gray-700 text-sm mb-2"
               ><span
                 [ngClass]="{
                   'bg-blue-500 text-white rounded-full p-1': isToday(day)
