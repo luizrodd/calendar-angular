@@ -1,39 +1,32 @@
-<div class="p-10">
+<div class="p-3 sm:p-10">
   <!-- header -->
-  <div class="flex justify-between items-center">
+  <div class="flex items-start sm:flex-row flex-col sm:items-center sm:justify-between mb-5">
     <div class="flex items-center">
       <div class="mr-16">
-        <button
-          (click)="today()"
-          class="border py-2 px-5 rounded-3xl cursor-pointer hover:bg-gray-200"
-        >
+        <button (click)="today()" class="border py-2 px-5 rounded-3xl cursor-pointer hover:bg-gray-200">
           Hoje
         </button>
       </div>
       <div>
-        <div class="flex items-center">
+        <div class="flex flex-col items-center sm:flex sm:flex-row">
           <div class="space-x-4 mr-10">
-            <button *ngIf="view == DayViewEnum.Month" (click)="previousMonth()" class="text-2xl cursor-pointer">
-              <
+            <button *ngIf="view == DayViewEnum.Month" (click)="previousMonth()" class="text-2xl cursor-pointer bg-gray-300 py-1 px-3 rounded-full">
+            < </button>
+            <button *ngIf="view == DayViewEnum.Month" (click)="nextMonth()" class="text-2xl cursor-pointer bg-gray-300 py-1 px-3 rounded-full">
+            >
             </button>
-            <button *ngIf="view == DayViewEnum.Month" (click)="nextMonth()" class="text-2xl cursor-pointer">
-              >
-            </button>
-            <button *ngIf="view == DayViewEnum.Week" (click)="previousWeek()" class="text-2xl cursor-pointer">
-              <
-            </button>
-            <button *ngIf="view == DayViewEnum.Week" (click)="nextWeek()" class="text-2xl cursor-pointer">
-              >
+            <button *ngIf="view == DayViewEnum.Week" (click)="previousWeek()" class="text-2xl cursor-pointer bg-gray-300 py-1 px-3 rounded-full">
+            < </button>
+            <button *ngIf="view == DayViewEnum.Week" (click)="nextWeek()" class="text-2xl cursor-pointer bg-gray-300 py-1 px-3 rounded-full">
+            >
             </button>
 
-            <button *ngIf="view == DayViewEnum.Day" (click)="previousDay()" class="text-2xl cursor-pointer">
-              <
-            </button>
+            <button *ngIf="view == DayViewEnum.Day" (click)="previousDay()" class="text-2xl cursor-pointer bg-gray-300 py-1 px-3 rounded-full">
+            < </button>
 
-            <button *ngIf="view == DayViewEnum.Day" (click)="nextDay()" class="text-2xl cursor-pointer">
-              >
+            <button *ngIf="view == DayViewEnum.Day" (click)="nextDay()" class="text-2xl cursor-pointer bg-gray-300 py-1 px-3 rounded-full">
+            >
             </button>
-
           </div>
           <div class="text-2xl" *ngIf="view == DayViewEnum.Month">
             {{ currentDay | date : "MMMM yyyy" }}
@@ -48,64 +41,64 @@
       </div>
     </div>
 
+    <div class="flex space-x-2">
+      <div class="custom-select">
+        <label for="">Filtrar por classe</label>
+        <select>
+          <option>1 Serie</option>
+          <option>2 Serie</option>
+          <option>3 Serie</option>
+        </select>
+      </div>
+
+      <div class="custom-select">
+        <label for="">Filtrar por disciplina</label>
+        <select >
+          <option>Matematica</option>
+          <option>Portugues</option>
+        </select>
+      </div>
+
+    </div>
+
     <div>
-      <select
-        (change)="changeView($event)"
-        class="border py-2 px-5 rounded-3xl cursor-pointer hover:bg-gray-200"
-      >
-        <option *ngFor="let view of daysView" [value]="view">{{ view }}</option>
+      <select (change)="changeView($event)" class="border py-2 px-5 rounded-3xl cursor-pointer hover:bg-gray-200" [ngClass]="{}">
+        <option *ngFor="let view of daysView" [value]="view" [selected]="view == view">{{ view }}</option>
       </select>
     </div>
   </div>
 
-  <table
-    *ngIf="view == DayViewEnum.Month"
-    class="w-full mt-10 border-gray-200 rounded-2xl overflow-hidden border border-separate border-l-0 border-r-0 rounded-4 border-spacing-0"
-  >
-    <thead
-      class="table-header-group align-middle border-blue-800 border-separate"
-    >
+  <table *ngIf="view == DayViewEnum.Month"
+    class="w-full mt-10 border-gray-200 rounded-2xl overflow-hidden border border-separate border-l-0 border-r-0 rounded-4 border-spacing-0">
+    <thead class="table-header-group align-middle border-blue-800 border-separate">
       <tr class="table-row align-inherit border-b-0">
-        <th
-          *ngFor="let day of weekDays"
-          class="p-2 text-center border border-gray-200 border-b-0 border-t-0"
-        >
+        <th *ngFor="let day of weekDays" class="p-2 text-center border border-gray-200 border-b-0 border-t-0">
           {{ day }}.
         </th>
       </tr>
     </thead>
     <tbody>
-      <tr
-        *ngFor="let week of daysOfWeeksInMonth"
-        class="table-row align-inherit border-blue-200"
-      >
-        <td
-          *ngFor="let day of week"
-          class="border border-gray-200 w-20  text-left align-top"
-          [ngClass]="{
+      <tr *ngFor="let week of daysOfWeeksInMonth" class="table-row align-inherit border-blue-200">
+        <td *ngFor="let day of week" class="border border-gray-200 w-20  text-left align-top" [ngClass]="{
             'bg-gray-200': isToday(day),
             'h-full': countOfEventOnMonth(day) > 4,
             'h-32': countOfEventOnMonth(day) <= 4
-          }"
-        >
+          }">
           <div *ngIf="day" class="flex flex-col">
-            <span class="text-gray-700 text-sm mb-2">
-              <span
-          [ngClass]="{
+            <span class="text-gray-700 text-lg m-1">
+              <span [ngClass]="{
             'bg-blue-500 text-white rounded-full p-1': isToday(day)
-          }"
-              >
-          {{ day.getDate() }}
+          }">
+                {{ day.getDate() }}
               </span>
             </span>
             <ul class="list-none p-0">
               <ng-container *ngFor="let event of events">
-          <li
-            *ngIf="validateIfShowEvent(event, day)"
-            class="mb-1 p-1 text-xs bg-green-700 w-full rounded-sm text-white cursor-pointer"
-          >
-            <span>{{ event.title }}</span>
-          </li>
+                <li (click)="openDetailsDialog(event)" *ngIf="validateIfShowEvent(event, day)"
+                  class="mb-1 p-1 font-medium w-full rounded-sm text-white cursor-pointer"
+                  [ngStyle]="{ 'background-color': getClassColor(event.title) }">
+                  <span>{{ event.title }}</span>
+                </li>
               </ng-container>
             </ul>
           </div>
@@ -114,18 +107,11 @@
     </tbody>
   </table>
 
-  <table
-    *ngIf="view == DayViewEnum.Week"
-    class="w-full mt-10 border-gray-200 rounded-2xl overflow-hidden border border-separate border-l-0 border-r-0 rounded-4 border-spacing-0"
-  >
-    <thead
-      class="table-header-group align-middle border-blue-800 border-separate"
-    >
+  <table *ngIf="view == DayViewEnum.Week"
+    class="w-full mt-10 border-gray-200 rounded-2xl overflow-hidden border border-separate border-l-0 border-r-0 rounded-4 border-spacing-0">
+    <thead class="table-header-group align-middle border-blue-800 border-separate">
       <tr class="table-row align-inherit border-b-0">
-        <th
-          class="p-2 text-center border border-gray-200 border-b-0 border-t-0"
-          *ngFor="let day of weekDays"
-        >
+        <th class="p-2 text-center border border-gray-200 border-b-0 border-t-0" *ngFor="let day of weekDays">
           {{ day }}
         </th>
       </tr>
@@ -133,30 +119,25 @@
     <tbody>
       <tr class="table-row align-inherit border-blue-200">
         <td
-          class="border border-gray-200 w-20 h-full text-left align-top "
+          class="border border-gray-200 w-20 h-full text-left align-top"
           [ngClass]="{
             'bg-gray-200': isToday(day),
             'h-full': countOfEventOnMonth(day) > 4,
             'h-32': countOfEventOnMonth(day) <= 4
-          }"
-          *ngFor="let day of daysOfWeek"
-        >
+          }" *ngFor="let day of daysOfWeek">
           <div class="flex flex-col h-full">
-            <span class="text-gray-700 text-sm mb-2"
+            <span class="text-gray-700 text-sm"
               ><span
                 [ngClass]="{
                   'bg-blue-500 text-white rounded-full p-1': isToday(day)
-                }"
-              >
+                }">
                 {{ day.getDate() }}
-              </span></span
-            >
+              </span></span>
             <ul>
               <ng-container *ngFor="let event of events">
-                <li
-                  class="mb-1 p-1 text-xs bg-green-700 w-full rounded-sm text-white cursor-pointer"
-                  *ngIf="validateIfShowEvent(event, day)"
-                >
+                <li (click)="openDetailsDialog(event)" class="mb-1 p-1 text-xs w-full rounded-sm text-white cursor-pointer"
+                [ngStyle]="{ 'background-color': getClassColor(event.title) }"
+                  *ngIf="validateIfShowEvent(event, day)">
                   <span>{{ event.title }}</span>
                 </li>
               </ng-container>
@@ -170,8 +151,10 @@
   <table *ngIf="view == DayViewEnum.Day" class="w-full border-collapse">
     <thead>
       <tr>
-        <th>Time</th>
-        <th>{{ currentDay | date }}</th>
+        <th>Hora</th>
+        <th class="flex justify-start "><span class="bg-blue-500 rounded-full p-1 px-2">
+            {{ currentDay | date: 'dd' }}
+          </span></th>
       </tr>
     </thead>
     <tbody>
@@ -182,7 +165,7 @@
         <td class="border-t border-gray-200 h-14 group-hover:bg-gray-50">
           <ul>
             <ng-container *ngFor="let event of events">
-              <li *ngIf="validateIfShowEventTime(event, currentDay, time)">
+              <li *ngIf="validateIfShowEventTime(event, currentDay, time)" class="bg-blue-400 mb-1 rounded p-2 text-black font-semibold cursor-pointer hover:bg-blue-300">
                 <span>{{ event.title }}</span>
               </li>
             </ng-container>

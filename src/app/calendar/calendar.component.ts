@@ -2,87 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { CalendarService } from './service/calendar.service';
 import { CommonModule } from '@angular/common';
 import { isWithinInterval } from 'date-fns';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { CalendarDetailsComponent } from './calendar-details/calendar-details.component';
+import { LessonDTO, DayViewEnum, type CalendarEvent } from './calendar.interface';
 
-interface Lesson {
-  date: Date;
-  title: string;
-  startDate: Date;
-  endDate: Date;
-  startTime: string;
-  endTime: string;
-}
-
-export enum DayViewEnum{
-  Month,
-  Week,
-  Day
-}
 
 @Component({
   selector: 'app-calendar',
-  imports: [CommonModule],
+  imports: [CommonModule, MatDialogModule],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css',
 })
 export class CalendarComponent implements OnInit {
-  events: Lesson[] = [
-    {
-      date: new Date(),
-      title: 'Event 1',
-      startDate: new Date(),
-      endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-      startTime: '10:00',
-      endTime: '12:00',
-    },
-    {
-      date: new Date(),
-      title: 'Event 2',
-      startDate: new Date(),
-      endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-      startTime: '10:00',
-      endTime: '12:00',
-    },
-    {
-      date: new Date(),
-      title: 'Event 4',
-      startDate: new Date(),
-      endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-      startTime: '10:00',
-      endTime: '12:00',
-    },
-    {
-      date: new Date(),
-      title: 'Event 5',
-      startDate: new Date(),
-      endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-      startTime: '10:00',
-      endTime: '12:00',
-    },
-    {
-      date: new Date(),
-      title: 'Event 6',
-      startDate: new Date(),
-      endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-      startTime: '10:00',
-      endTime: '12:00',
-    },
-    {
-      date: new Date(),
-      title: 'Event 7',
-      startDate: new Date(),
-      endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-      startTime: '10:00',
-      endTime: '12:00',
-    },
-    {
-      date: new Date(new Date().setDate(new Date().getDate() + 1)),
-      title: 'Event 3',
-      startDate: new Date(),
-      endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
-      startTime: '10:00',
-      endTime: '12:00',
-    },
-  ];
+  events: CalendarEvent[] = [];
 
   view: DayViewEnum = DayViewEnum.Month;
   DayViewEnum: typeof DayViewEnum = DayViewEnum;
@@ -90,15 +22,26 @@ export class CalendarComponent implements OnInit {
   weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   timeDay: string[] = [];
 
+  classColors: { class: string, color: string }[] = [
+    { class: '1 Série', color: '#FF0000' },
+    { class: '2 Série', color: '#00FF00' },
+    { class: '3 Série', color: '#0000FF' },
+    { class: '1 Ano', color: '#FFFF00' },
+    { class: '2 Ano', color: '#00FFFF' },
+    { class: '3 Ano', color: '#FF00FF' },
+    { class: '4 Ano', color: '#000000' },
+    { class: '5 Ano', color: '#FFFFFF' }
+  ]
+
 
   daysOfWeeksInMonth: Date[][] = [];
   daysOfWeek: Date[] = [];
   currentDay: Date = new Date();
 
-  constructor(private _service: CalendarService) {}
+  constructor(private _service: CalendarService, private _dialog: MatDialog) {}
 
   ngOnInit() {
-    this.timeDay = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+    this.timeDay = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
 
     this._service.currentDaysOfMonth$.subscribe((weeks: Date[][]) => {
       this.daysOfWeeksInMonth = weeks;
@@ -111,6 +54,21 @@ export class CalendarComponent implements OnInit {
     this._service.currentDay$.subscribe((day: Date) => {
       this.currentDay = day;
     });
+
+    this._service.get().subscribe((events: LessonDTO[]) => {
+      this.events = events.flatMap((data) => {
+        return data.schedules.map((schedule) => {
+          return {
+            date: schedule.startDate,
+            title: data.subject.name + ' ' + data.subject.class + ' ' + data.subject.classroom,
+            startDate: schedule.startDate,
+            endDate: schedule.endDate,
+            startTime: schedule.startTime,
+            endTime: schedule.endTime,
+          };
+        });
+      });
+    })
   }
 
   isToday(day: Date): boolean {
@@ -146,7 +104,7 @@ export class CalendarComponent implements OnInit {
     );
   }
 
-  validateIfShowEvent(event: Lesson, day: Date): boolean {
+  validateIfShowEvent(event: CalendarEvent, day: Date): boolean {
     const start = new Date(event.startDate.getFullYear(), event.startDate.getMonth(), event.startDate.getDate());
     const end = new Date(event.endDate.getFullYear(), event.endDate.getMonth(), event.endDate.getDate());
     const current = new Date(day.getFullYear(), day.getMonth(), day.getDate());
@@ -158,7 +116,7 @@ export class CalendarComponent implements OnInit {
     return false;
   }
 
-  validateIfShowEventTime(event: Lesson, day: Date, time: string): boolean {
+  validateIfShowEventTime(event: CalendarEvent, day: Date, time: string): boolean {
     const timeEvent = event.startTime;
     return timeEvent === time && this.validateIfShowEvent(event, day);
   }
@@ -195,5 +153,22 @@ export class CalendarComponent implements OnInit {
 
   countOfEventOnMonth(day: Date): number{
     return this.events.filter(event => event.date.toDateString() === day.toDateString()).length;
+  }
+
+  getClassColor(title: string): string{
+    const classColor = this.classColors.find(c => title.includes(c.class));
+    return classColor ? classColor.color : '#FFFFFF';
+  }
+
+  openDetailsDialog(event: CalendarEvent){
+    this._dialog.open(CalendarDetailsComponent, 
+      {
+        data: {
+          event: event
+        },
+        width: '500px',
+        height: '500px',
+      },
+    )
   }
 }
