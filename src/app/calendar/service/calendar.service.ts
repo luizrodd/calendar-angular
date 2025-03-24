@@ -2,12 +2,18 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 import { eachDayOfInterval } from 'date-fns';
+import type { LessonDTO } from '../calendar.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CalendarService {
   constructor() {}
+
+  private _events: BehaviorSubject<LessonDTO[]> = new BehaviorSubject<LessonDTO[]>([]);
+  get events$(): Observable<LessonDTO[]> {
+    return this._events.asObservable();
+  }
 
   private _currentDay: BehaviorSubject<Date> = new BehaviorSubject<Date>(new Date());
   private _currentDaysOfWeek: BehaviorSubject<Date[]> = new BehaviorSubject<Date[]>([]);
@@ -91,5 +97,98 @@ export class CalendarService {
     this.updateCurrentMonth(new Date());
     this.updateCurrentWeek(new Date());
     this.updateCurrentDay(new Date());
+  }
+
+  get(): Observable<LessonDTO[]>{
+    var events: LessonDTO[] = [
+      {
+      subject: {
+        class: '1 Série',
+        classroom: 'A',
+        name: 'Matemática',
+      },
+      schedules: [
+        {
+        dayOfWeek: 1,
+        endDate: new Date(),
+        endTime: '12:00',
+        startDate: new Date(),
+        startTime: '10:00'
+        },
+        {
+        dayOfWeek: 3,
+        endDate: new Date(),
+        endTime: '14:00',
+        startDate: new Date(),
+        startTime: '12:00'
+        },
+        {
+        dayOfWeek: 5,
+        endDate: new Date(),
+        endTime: '16:00',
+        startDate: new Date(),
+        startTime: '14:00'
+        }
+      ],
+      students: [
+        {
+        id: '1',
+        name: 'João',
+        rm: '123'
+        },
+        {
+        id: '2',
+        name: 'Maria',
+        rm: '124'
+        }
+      ]
+      },
+      {
+        subject: {
+          class: '2 Série',
+          classroom: 'A',
+          name: 'Matemática',
+        },
+        schedules: [
+          {
+          dayOfWeek: 1,
+          endDate: new Date(),
+          endTime: '12:00',
+          startDate: new Date(),
+          startTime: '10:00'
+          },
+          {
+          dayOfWeek: 3,
+          endDate: new Date(),
+          endTime: '14:00',
+          startDate: new Date(),
+          startTime: '12:00'
+          },
+          {
+          dayOfWeek: 5,
+          endDate: new Date(),
+          endTime: '16:00',
+          startDate: new Date(),
+          startTime: '14:00'
+          }
+        ],
+        students: [
+          {
+          id: '1',
+          name: 'João',
+          rm: '123'
+          },
+          {
+          id: '2',
+          name: 'Maria',
+          rm: '124'
+          }
+        ]
+        }
+    ];
+
+    this._events.next(events);
+
+    return this.events$;
   }
 }
